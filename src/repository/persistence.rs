@@ -1,7 +1,7 @@
 use actix_web::http::StatusCode;
 use chrono::Local;
 use derive_more::{Display, Error, From};
-use mysql::{params, prelude::*};
+use mysql::prelude::*;
 use rand::Rng;
 
 #[derive(Debug, Display, Error, From)]
