@@ -1,67 +1,74 @@
 use crate::model::table_model::TableItem;
-use actix_web::http::StatusCode;
+use crate::model::response_model::{AddItemsResponse, ListTableItemsResponse, RemoveTableItemResponse};
 use chrono::Local;
-use derive_more::{Display, Error, From};
-use log::info;
+use log::{error};
+use mysql::Pool;
 use mysql::prelude::*;
 use rand::Rng;
 
-#[derive(Debug, Display, Error, From)]
-pub enum PersistenceError {
-    EmptyItemNames,
-
-    // MysqlError(mysql::Error),
-    //
-    // Unknown,
-}
-
-impl actix_web::ResponseError for PersistenceError {
-    fn status_code(&self) -> StatusCode {
-        match self {
-            PersistenceError::EmptyItemNames => StatusCode::BAD_REQUEST,
-
-            // PersistenceError::MysqlError(_) | PersistenceError::Unknown => {
-            //     StatusCode::INTERNAL_SERVER_ERROR
-            // }
-        }
-    }
-}
 
 pub fn add_items_to_table(
-    pool: &mysql::Pool,
+    pool: &Pool,
     table_number: u8,
     items_names: Vec<String>,
-) {
+) -> AddItemsResponse {
     let mut values = Vec::new();
-    for item_name in items_names {
+    for item_name in &items_names {
         if item_name.replace(' ', "").trim().is_empty() {
             continue;
         }
-        let timestamp = Local::now().format("%Y-%m-%d %H:%M:%S").to_string();
+        let ordered_on = Local::now().format("%Y-%m-%d %H:%M:%S").to_string();
         let prepare_minutes = rand::thread_rng().gen_range(5..16);
 
         values.push(format!(
             "({}, '{}', '{}', {})",
             table_number,
             item_name,
-            timestamp,
+            ordered_on,
             prepare_minutes
         ));
     }
+
+    let mut conn = pool.get_conn().unwrap();
+    conn.query_drop("START TRANSACTION").unwrap();  // Begin a transaction
 
     let query = format!(
         "INSERT INTO table_items (table_number, item_name, ordered_on, prepare_minutes) VALUES {}",
         values.join(", ")
     );
-    let mut conn = pool.get_conn().unwrap();
-    conn.query_drop(query).expect("Failed to insert table items");
+
+    let mut item_ids = Vec::new();
+    match conn.query_drop(query) {
+        Ok(_) => {
+            let last_id = conn.query_first::<u8, _>("SELECT LAST_INSERT_ID()").unwrap_or(Some(0)).unwrap();
+            for i in 0..values.len() {
+                item_ids.push(last_id + i as u8);
+            }
+            conn.query_drop("COMMIT").unwrap();  // Commit the transaction
+            let response = AddItemsResponse {
+                status: "success".to_string(),
+                message: format!("{} item(s) added to table number {}", &items_names.len(), table_number),
+                items_ids: item_ids,
+            };
+            response
+        }
+        Err(e) => {
+            conn.query_drop("ROLLBACK").unwrap();  // Rollback the transaction on error
+            error!("{:?}", e);
+            AddItemsResponse {
+                status: "failed".to_string(),
+                message: format!("Could not add items to table number {}", table_number),
+                items_ids: item_ids,
+            }
+        }
+    }
 }
 
-pub fn get_table_items(pool: &mysql::Pool,
+pub fn get_table_items(pool: &Pool,
                        table_number: u8,
                        items_ids: Option<Vec<u8>>,
-                       items_names: Option<Vec<String>>
-) {
+                       items_names: Option<Vec<String>>,
+) -> ListTableItemsResponse {
     let mut query = format!(
         "SELECT * FROM table_items WHERE table_number = '{}'",
         table_number
@@ -78,23 +85,22 @@ pub fn get_table_items(pool: &mysql::Pool,
     }
 
     let mut conn = pool.get_conn().unwrap();
-    let results = conn.query_map(query,
-                                 |(
-                                      item_id,
-                                      table_number,
-                                      item_name,
-                                      prepare_minutes,
-                                      ordered_on
-                                  )| TableItem {
-                                     item_id,
-                                     table_number,
-                                     item_name,
-                                     prepare_minutes,
-                                     ordered_on,
-                                 }).unwrap();
-
-    for row in results {
-        println!("{:?}", row);
+    match conn.query_map(query, |(item_id, table_number, item_name, prepare_minutes, ordered_on)| TableItem { item_id, table_number, item_name, prepare_minutes, ordered_on }) {
+        Ok(table_items) => {
+            ListTableItemsResponse {
+                status: "success".to_string(),
+                message: format!("{} table items are found", table_items.len()),
+                table_items,
+            }
+        }
+        Err(e) => {
+            error!("{:?}", e);
+            ListTableItemsResponse {
+                status: "failed".to_string(),
+                message: "Could not find desired table items".to_string(),
+                table_items: Vec::new(),
+            }
+        }
     }
 }
 
@@ -123,12 +129,33 @@ fn compute_conditions(items_ids: Option<Vec<u8>>,
 }
 
 
-pub fn remove_table_item(pool: &mysql::Pool, item_id: u8) {
+pub fn remove_table_item(
+    pool: &Pool,
+    item_id: u8,
+) -> RemoveTableItemResponse {
     let query = format!(
         "DELETE FROM table_items WHERE item_id = '{}'",
         item_id
     );
+
     let mut conn = pool.get_conn().unwrap();
-    conn.query_drop(query).expect("Delete table item");
-    info!("Deleted item with id {item_id}")
+    conn.query_drop("START TRANSACTION").unwrap();
+
+    match conn.query_drop(query) {
+        Ok(_) => {
+            conn.query_drop("COMMIT").unwrap();
+            RemoveTableItemResponse {
+                status: "success".to_string(),
+                message: format!("Deleted table item with item_id {}", item_id),
+            }
+        }
+        Err(e) => {
+            conn.query_drop("ROLLBACK").unwrap();
+            error!("{:?}", e);
+            RemoveTableItemResponse {
+                status: "failed".to_string(),
+                message: "Could not delete the desired table item".to_string(),
+            }
+        }
+    }
 }
