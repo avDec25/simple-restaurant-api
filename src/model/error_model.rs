@@ -1,6 +1,6 @@
 use actix_web::{HttpResponse, ResponseError};
 use derive_more::{Display, Error, From};
-use log::{error, warn};
+use log::{error};
 use serde::Serialize;
 
 #[derive(Debug, Display, Error, From)]
@@ -9,7 +9,6 @@ pub enum PersistenceError {
     TransactionStartError,
     CommitError,
     RollbackError,
-    Unknown,
 }
 
 #[derive(Debug, Display, Error, Serialize)]
@@ -22,36 +21,29 @@ impl ResponseError for PersistenceError {
         match self {
             PersistenceError::DBConnError => {
                 error!("Failed: Unable to acquire a connection from database connection pool");
-                HttpResponse::InternalServerError().json(PersistenceErrorResponse{
+                HttpResponse::InternalServerError().json(PersistenceErrorResponse {
                     message: "Failed: Error connecting with Database".to_string(),
                 })
             }
 
             PersistenceError::TransactionStartError => {
                 error!("Failed: Unable to Start Transaction");
-                HttpResponse::InternalServerError().json(PersistenceErrorResponse{
+                HttpResponse::InternalServerError().json(PersistenceErrorResponse {
                     message: "Failed: Database busy, Please try again later.".to_string(),
                 })
             }
 
             PersistenceError::CommitError => {
                 error!("Failed: Unable to Commit Transaction");
-                HttpResponse::InternalServerError().json(PersistenceErrorResponse{
+                HttpResponse::InternalServerError().json(PersistenceErrorResponse {
                     message: "Failed: Database busy, Please try again later.".to_string(),
                 })
             }
 
             PersistenceError::RollbackError => {
                 error!("Failed: Unable to Rollback Transaction");
-                HttpResponse::InternalServerError().json(PersistenceErrorResponse{
+                HttpResponse::InternalServerError().json(PersistenceErrorResponse {
                     message: "Failed: Database busy, Please report rollback failure".to_string(),
-                })
-            }
-
-            err => {
-                error!("Failed: Unexpected error {}", err);
-                HttpResponse::InternalServerError().json(PersistenceErrorResponse{
-                    message: "An Unexpected error occurred".to_string(),
                 })
             }
         }

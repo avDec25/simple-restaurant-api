@@ -1,15 +1,11 @@
 use crate::model::error_model::PersistenceError;
 use crate::model::response_model::{AddItemsResponse, ListTableItemsResponse, RemoveTableItemResponse};
 use crate::model::table_model::TableItem;
-use actix_web::http::StatusCode;
-use actix_web::{HttpResponse, ResponseError};
 use chrono::Local;
 use log::error;
 use mysql::prelude::*;
 use mysql::Pool;
 use rand::Rng;
-use serde::Serialize;
-use std::error::Error;
 
 pub fn add_items_to_table(
     pool: &Pool,
