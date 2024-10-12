@@ -47,7 +47,7 @@ pub fn add_items_to_table(
             conn.query_drop("COMMIT").unwrap();  // Commit the transaction
             let response = AddItemsResponse {
                 status: "success".to_string(),
-                message: format!("{} item(s) added to table number {}", &items_names.len(), table_number),
+                message: format!("Added {} item(s) to table number {}", &items_names.len(), table_number),
                 items_ids: item_ids,
             };
             response
@@ -57,7 +57,7 @@ pub fn add_items_to_table(
             error!("{:?}", e);
             AddItemsResponse {
                 status: "failed".to_string(),
-                message: format!("Could not add items to table number {}", table_number),
+                message: format!("Could not add item(s) to table number {}", table_number),
                 items_ids: item_ids,
             }
         }
@@ -89,7 +89,7 @@ pub fn get_table_items(pool: &Pool,
         Ok(table_items) => {
             ListTableItemsResponse {
                 status: "success".to_string(),
-                message: format!("{} table items are found", table_items.len()),
+                message: format!("Found {} table item(s)", table_items.len()),
                 table_items,
             }
         }
@@ -143,10 +143,18 @@ pub fn remove_table_item(
 
     match conn.query_drop(query) {
         Ok(_) => {
+            let affected_rows = conn.affected_rows();
             conn.query_drop("COMMIT").unwrap();
-            RemoveTableItemResponse {
-                status: "success".to_string(),
-                message: format!("Deleted table item with item_id {}", item_id),
+            if affected_rows > 0 {
+                RemoveTableItemResponse {
+                    status: "success".to_string(),
+                    message: format!("Removed table item with item_id {}", item_id),
+                }
+            } else {
+                RemoveTableItemResponse {
+                    status: "success".to_string(),
+                    message: format!("No table item exists with item_id {}", item_id),
+                }
             }
         }
         Err(e) => {
@@ -154,7 +162,7 @@ pub fn remove_table_item(
             error!("{:?}", e);
             RemoveTableItemResponse {
                 status: "failed".to_string(),
-                message: "Could not delete the desired table item".to_string(),
+                message: "Could not remove the desired table item".to_string(),
             }
         }
     }
