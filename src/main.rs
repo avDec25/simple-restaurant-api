@@ -4,7 +4,7 @@ use actix_web::middleware::Logger;
 use log::info;
 use mysql::Pool;
 use crate::api::health_check_api::health_check;
-use crate::api::table_api::add_items;
+use crate::api::table_api::{add_items, get_items, remove_item};
 
 mod api;
 mod model;
@@ -41,6 +41,8 @@ async fn main() -> std::io::Result<()> {
             .app_data(shared_data.clone())
             .service(health_check)
             .service(add_items)
+            .service(get_items)
+            .service(remove_item)
     }).bind("127.0.0.1:8080")?
         .workers(2)
         .run()
