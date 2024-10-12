@@ -1,5 +1,5 @@
-use chrono::Local;
 use actix_web::{get, HttpResponse, Responder};
+use chrono::Local;
 
 #[get("/health_check")]
 pub async fn health_check() -> impl Responder {

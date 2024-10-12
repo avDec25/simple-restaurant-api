@@ -1,10 +1,10 @@
-use std::env;
-use actix_web::{web, App, HttpServer};
-use actix_web::middleware::Logger;
-use log::info;
-use mysql::Pool;
 use crate::api::health_check_api::health_check;
 use crate::api::table_api::{add_items, get_items, remove_item};
+use actix_web::middleware::Logger;
+use actix_web::{web, App, HttpServer};
+use log::info;
+use mysql::Pool;
+use std::env;
 
 mod api;
 mod model;

@@ -1,17 +1,21 @@
-use crate::model::table_model::TableItem;
+use crate::model::error_model::PersistenceError;
 use crate::model::response_model::{AddItemsResponse, ListTableItemsResponse, RemoveTableItemResponse};
+use crate::model::table_model::TableItem;
+use actix_web::http::StatusCode;
+use actix_web::{HttpResponse, ResponseError};
 use chrono::Local;
-use log::{error};
-use mysql::Pool;
+use log::error;
 use mysql::prelude::*;
+use mysql::Pool;
 use rand::Rng;
-
+use serde::Serialize;
+use std::error::Error;
 
 pub fn add_items_to_table(
     pool: &Pool,
     table_number: u8,
     items_names: Vec<String>,
-) -> AddItemsResponse {
+) -> Result<AddItemsResponse, PersistenceError> {
     let mut values = Vec::new();
     for item_name in &items_names {
         if item_name.replace(' ', "").trim().is_empty() {
@@ -29,8 +33,14 @@ pub fn add_items_to_table(
         ));
     }
 
-    let mut conn = pool.get_conn().unwrap();
-    conn.query_drop("START TRANSACTION").unwrap();  // Begin a transaction
+    let mut conn = match pool.get_conn() {
+        Ok(conn) => {conn}
+        Err(_) => { return Err(PersistenceError::DBConnError) }
+    };
+    match conn.query_drop("START TRANSACTION") {
+        Ok(_) => {}
+        Err(_) => {return Err(PersistenceError::TransactionStartError)}
+    }
 
     let query = format!(
         "INSERT INTO table_items (table_number, item_name, ordered_on, prepare_minutes) VALUES {}",
@@ -40,35 +50,42 @@ pub fn add_items_to_table(
     let mut item_ids = Vec::new();
     match conn.query_drop(query) {
         Ok(_) => {
-            let last_id = conn.query_first::<u8, _>("SELECT LAST_INSERT_ID()").unwrap_or(Some(0)).unwrap();
+            let last_id = conn.query_first::<u8, _>("SELECT LAST_INSERT_ID()").unwrap_or(Some(0)).expect("Error: Unable to acquire the last inserted id");
             for i in 0..values.len() {
                 item_ids.push(last_id + i as u8);
             }
-            conn.query_drop("COMMIT").unwrap();  // Commit the transaction
+            match conn.query_drop("COMMIT") {
+                Ok(_) => {}
+                Err(_) => {return Err(PersistenceError::CommitError)}
+            }
             let response = AddItemsResponse {
                 status: "success".to_string(),
                 message: format!("Added {} item(s) to table number {}", &items_names.len(), table_number),
                 items_ids: item_ids,
             };
-            response
+            Ok(response)
         }
         Err(e) => {
-            conn.query_drop("ROLLBACK").unwrap();  // Rollback the transaction on error
+            match conn.query_drop("ROLLBACK") {
+                Ok(_) => {}
+                Err(_) => {return Err(PersistenceError::RollbackError)}
+            }
             error!("{:?}", e);
-            AddItemsResponse {
+            Ok(AddItemsResponse {
                 status: "failed".to_string(),
                 message: format!("Could not add item(s) to table number {}", table_number),
                 items_ids: item_ids,
-            }
+            })
         }
     }
 }
+
 
 pub fn get_table_items(pool: &Pool,
                        table_number: u8,
                        items_ids: Option<Vec<u8>>,
                        items_names: Option<Vec<String>>,
-) -> ListTableItemsResponse {
+) -> Result<ListTableItemsResponse, PersistenceError> {
     let mut query = format!(
         "SELECT * FROM table_items WHERE table_number = '{}'",
         table_number
@@ -84,22 +101,25 @@ pub fn get_table_items(pool: &Pool,
         }
     }
 
-    let mut conn = pool.get_conn().unwrap();
+    let mut conn = match pool.get_conn() {
+        Ok(conn) => {conn},
+        Err(_) => { return Err(PersistenceError::DBConnError) }
+    };
     match conn.query_map(query, |(item_id, table_number, item_name, prepare_minutes, ordered_on)| TableItem { item_id, table_number, item_name, prepare_minutes, ordered_on }) {
         Ok(table_items) => {
-            ListTableItemsResponse {
+            Ok(ListTableItemsResponse {
                 status: "success".to_string(),
                 message: format!("Found {} table item(s)", table_items.len()),
                 table_items,
-            }
+            })
         }
         Err(e) => {
             error!("{:?}", e);
-            ListTableItemsResponse {
+            Ok(ListTableItemsResponse {
                 status: "failed".to_string(),
                 message: "Could not find desired table items".to_string(),
                 table_items: Vec::new(),
-            }
+            })
         }
     }
 }
@@ -132,38 +152,50 @@ fn compute_conditions(items_ids: Option<Vec<u8>>,
 pub fn remove_table_item(
     pool: &Pool,
     item_id: u8,
-) -> RemoveTableItemResponse {
+) -> Result<RemoveTableItemResponse, PersistenceError> {
     let query = format!(
         "DELETE FROM table_items WHERE item_id = '{}'",
         item_id
     );
 
-    let mut conn = pool.get_conn().unwrap();
-    conn.query_drop("START TRANSACTION").unwrap();
+    let mut conn = match pool.get_conn() {
+        Ok(conn) => {conn},
+        Err(_) => { return Err(PersistenceError::DBConnError) }
+    };
+    match conn.query_drop("START TRANSACTION") {
+        Ok(_) => {}
+        Err(_) => {return Err(PersistenceError::TransactionStartError)}
+    }
 
     match conn.query_drop(query) {
         Ok(_) => {
             let affected_rows = conn.affected_rows();
-            conn.query_drop("COMMIT").unwrap();
+            match conn.query_drop("COMMIT") {
+                Ok(_) => {}
+                Err(_) => {return Err(PersistenceError::CommitError)}
+            }
             if affected_rows > 0 {
-                RemoveTableItemResponse {
+                Ok(RemoveTableItemResponse {
                     status: "success".to_string(),
                     message: format!("Removed table item with item_id {}", item_id),
-                }
+                })
             } else {
-                RemoveTableItemResponse {
+                Ok(RemoveTableItemResponse {
                     status: "success".to_string(),
                     message: format!("No table item exists with item_id {}", item_id),
-                }
+                })
             }
         }
         Err(e) => {
-            conn.query_drop("ROLLBACK").unwrap();
+            match conn.query_drop("ROLLBACK") {
+                Ok(_) => {}
+                Err(_) => {return Err(PersistenceError::RollbackError)}
+            }
             error!("{:?}", e);
-            RemoveTableItemResponse {
+            Ok(RemoveTableItemResponse {
                 status: "failed".to_string(),
                 message: "Could not remove the desired table item".to_string(),
-            }
+            })
         }
     }
 }

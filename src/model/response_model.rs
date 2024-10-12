@@ -1,5 +1,5 @@
-use serde::Serialize;
 use crate::model::table_model::TableItem;
+use serde::Serialize;
 
 #[derive(Serialize)]
 pub struct AddItemsResponse {
