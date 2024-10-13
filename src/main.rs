@@ -43,8 +43,8 @@ async fn main() -> std::io::Result<()> {
             .service(add_items)
             .service(get_items)
             .service(remove_item)
-    }).bind("127.0.0.1:8080")?
-        .workers(2)
+    }).bind("0.0.0.0:8080")?
+        .workers(11)
         .run()
         .await
 }
