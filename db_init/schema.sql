@@ -1,8 +1,8 @@
-CREATE DATABASE restaurant;
+CREATE DATABASE IF NOT EXISTS  restaurant;
 
 USE restaurant;
 
-CREATE TABLE table_items (
+CREATE TABLE IF NOT EXISTS table_items (
   item_id INT UNSIGNED PRIMARY KEY NOT NULL AUTO_INCREMENT,
   table_number INT UNSIGNED NOT NULL,
   item_name VARCHAR(127) NOT NULL,
