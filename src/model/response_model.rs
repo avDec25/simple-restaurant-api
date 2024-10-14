@@ -5,7 +5,7 @@ use serde::Serialize;
 pub struct AddItemsResponse {
     pub status: String,
     pub message: String,
-    pub items_ids: Vec<u8>,
+    pub items_ids: Vec<u32>,
 }
 
 #[derive(Serialize)]

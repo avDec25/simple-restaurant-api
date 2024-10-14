@@ -9,7 +9,7 @@ use rand::Rng;
 
 pub fn add_items_to_table(
     pool: &Pool,
-    table_number: u8,
+    table_number: u32,
     items_names: Vec<String>,
 ) -> Result<AddItemsResponse, PersistenceError> {
     let mut values = Vec::new();
@@ -46,9 +46,9 @@ pub fn add_items_to_table(
     let mut item_ids = Vec::new();
     match conn.query_drop(query) {
         Ok(_) => {
-            let last_id = conn.query_first::<u8, _>("SELECT LAST_INSERT_ID()").unwrap_or(Some(0)).expect("Error: Unable to acquire the last inserted id");
+            let last_id = conn.query_first::<u32, _>("SELECT LAST_INSERT_ID()").unwrap_or(Some(0)).expect("Error: Unable to acquire the last inserted id");
             for i in 0..values.len() {
-                item_ids.push(last_id + i as u8);
+                item_ids.push(last_id + i as u32);
             }
             match conn.query_drop("COMMIT") {
                 Ok(_) => {}
@@ -78,8 +78,8 @@ pub fn add_items_to_table(
 
 
 pub fn get_table_items(pool: &Pool,
-                       table_number: u8,
-                       items_ids: Option<Vec<u8>>,
+                       table_number: u32,
+                       items_ids: Option<Vec<u32>>,
                        items_names: Option<Vec<String>>,
 ) -> Result<ListTableItemsResponse, PersistenceError> {
     let mut query = format!(
@@ -120,7 +120,7 @@ pub fn get_table_items(pool: &Pool,
     }
 }
 
-fn compute_conditions(items_ids: Option<Vec<u8>>,
+fn compute_conditions(items_ids: Option<Vec<u32>>,
                       items_names: Option<Vec<String>>,
 ) -> Vec<String> {
     let mut conditions = Vec::new();
@@ -147,7 +147,7 @@ fn compute_conditions(items_ids: Option<Vec<u8>>,
 
 pub fn remove_table_item(
     pool: &Pool,
-    item_id: u8,
+    item_id: u32,
 ) -> Result<RemoveTableItemResponse, PersistenceError> {
     let query = format!(
         "DELETE FROM table_items WHERE item_id = '{}'",
