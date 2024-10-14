@@ -6,7 +6,8 @@ COPY . /app
 RUN cd /app && cargo build --release
 
 # target container
-FROM rust:slim-bullseye 
+FROM rust:slim-bullseye
+ENV TZ=Asia/Tokyo
 RUN mkdir /app
 COPY --from=builder /app/target/release/simple-restaurant-api /app/simple-restaurant-api
 COPY .env /app/.env
