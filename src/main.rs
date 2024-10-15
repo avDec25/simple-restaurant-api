@@ -5,6 +5,7 @@ use actix_web::{web, App, HttpServer};
 use log::info;
 use mysql::Pool;
 use std::env;
+use actix_request_identifier::RequestIdentifier;
 
 mod api;
 mod model;
@@ -23,7 +24,7 @@ async fn main() -> std::io::Result<()> {
     // setting up database
     let db_host = env::var("MYSQL_HOST").expect("Please check MYSQL_HOST env var");
     let db_port = env::var("MYSQL_PORT").expect("Please check MYSQL_PORT env var");
-    let db_port = db_port.parse().expect("Please check PORT env var");
+    let db_port:u16 = db_port.parse().expect("Please check PORT env var");
     let db_name = env::var("MYSQL_DBNAME")
         .expect("Please check MYSQL_DBNAME env var");
     let db_user = env::var("MYSQL_USER")
@@ -56,6 +57,7 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .wrap(Logger::default())
+            .wrap(RequestIdentifier::with_uuid())
             .app_data(shared_data.clone())
             .service(health_check)
             .service(add_items)
