@@ -69,3 +69,42 @@ curl --location --request GET 'localhost:8080/table/list_items' \
 - ✅ The client MAY limit the number of specific tables in its requests to a finite set (at least 100).
 - ✅ The application MAY assign a length of time for the item to prepare as a random time between 5-15 minutes.
 - ✅ The application MAY keep the length of time for the item to prepare static
+
+---
+#### How to run
+- Inside the folder, `simple-restaurant-api`, execute: 
+ ```bash
+docker-compose up
+```
+Although, the application boots up in no time, this project gives a small wait after mysql-database is initialized 
+and rust application boots up.
+
+---
+
+#### How to Test APIs
+- install hurl by running:
+```bash
+brew install hurl
+```
+- inside testing folder execute
+```bash
+hurl --test .
+```
+this will test all apis, and their cases, one by one
+
+---
+
+#### How to Stress Test APIs
+- install k6 by running:
+```bash
+brew install k6
+```
+- Stress test by executing k6 command with appropriate parameters which are defined inside the .js file for stress test
+```bash
+k6 run add_items.js --console-output=console_out.txt
+```
+- k6's configurable parameters:
+```bash
+vus: number of concurrent requests
+duration: amount of time to continue hammering the API endpoint
+```
