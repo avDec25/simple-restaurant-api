@@ -7,7 +7,7 @@ Project implements three Primary APIs + 1 health check API, which are:
 - List Item(s) of a table API
 - Health Check API
 
-Requirements Covered:
+### Requirements Covered:
 - ✅ The client (the restaurant staff “devices” making the requests) MUST be able to: add one or more items with a table number, remove an item for a table, and query the items still remaining for a table.
 ```bash
 curl --location 'localhost:8080/table/add_items' \
