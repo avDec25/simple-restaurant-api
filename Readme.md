@@ -74,7 +74,7 @@ curl --location --request GET 'localhost:8080/table/list_items' \
 
 ---
 ### Tools
-| Tools  | Version |
+| Name   | Version |
 |--------|---------|
 | docker | 27.2.0  |
 | hurl   | 5.0.1   |
