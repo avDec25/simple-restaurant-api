@@ -9,3 +9,5 @@ CREATE TABLE IF NOT EXISTS table_items (
   prepare_minutes INT UNSIGNED NOT NULL,
   ordered_on DATETIME NOT NULL
 );
+
+CREATE INDEX index_on_table_number ON table_items (table_number);

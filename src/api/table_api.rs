@@ -2,9 +2,11 @@ use actix_request_identifier::RequestId;
 use crate::model::request_model::{
     AddItemsToTableRequest, ListTableItemsRequest, RemoveTableItemRequest,
 };
-use crate::repository::persistence::{add_items_to_table, get_table_items, remove_table_item};
+use crate::repository::remove_table_items::remove_table_item;
 use actix_web::{delete, get, post, web, HttpResponse, Responder};
 use mysql::Pool;
+use crate::repository::persist_table_items::add_items_to_table;
+use crate::repository::fetch_table_items::get_table_items;
 
 #[post("/table/add_items")]
 pub(crate) async fn add_items(
