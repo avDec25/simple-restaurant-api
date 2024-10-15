@@ -1,0 +1,115 @@
+{
+	"info": {
+		"_postman_id": "819ebe29-831b-4127-81c2-df0a4157fd50",
+		"name": "Restaurant API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "8587369"
+	},
+	"item": [
+		{
+			"name": "Health Check",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/health_check",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"health_check"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add Table Items",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"table_number\": 1,\n    \"items_names\": [\n        \"拉麺\",\n        \"うどん\",\n        \"そば\",\n        \"そうめん\",\n        \"中華そば\",\n        \"とんかつ\",\n        \"からあげ\",\n        \"やきにく\",\n        \"カレーライス\",\n        \"オムライス\"\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/table/add_items",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"table",
+						"add_items"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "List Table Items",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"table_number\": 1,\n    \"items_ids\": [8, 9],\n    \"items_names\": [\"うどん\"]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/table/list_items",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"table",
+						"list_items"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Remove Table Item",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"item_id\": 7\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/table/remove_item",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"table",
+						"remove_item"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
