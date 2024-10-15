@@ -73,6 +73,16 @@ curl --location --request GET 'localhost:8080/table/list_items' \
 - ✅ The application MAY keep the length of time for the item to prepare static
 
 ---
+### Tools
+| Tools  | Version |
+|--------|---------|
+| docker | 27.2.0  |
+| hurl   | 5.0.1   |
+| k6     | v0.54.0 |
+| mysql  | 8.4.2   |
+| rustc  | 1.81.0  |
+
+---
 #### How to run
 - Inside the folder, `simple-restaurant-api`, execute: 
  ```bash
