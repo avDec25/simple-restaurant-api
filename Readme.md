@@ -66,8 +66,7 @@ curl --location --request GET 'localhost:8080/table/list_items' \
 }'
 ```
 - ✅ The application MUST accept at least 10 simultaneous incoming add/remove/query requests.
-
-![Alt text](docs/handling_10_concurrent_requests.png)
+ ![Alt text](docs/handling_10_concurrent_requests.png)
 
 - ✅ The client MAY limit the number of specific tables in its requests to a finite set (at least 100).
 - ✅ The application MAY assign a length of time for the item to prepare as a random time between 5-15 minutes.
