@@ -11,7 +11,7 @@ pub fn remove_table_item(
     request_id: RequestId,
     item_id: u32,
 ) -> Result<RemoveTableItemResponse, PersistenceError> {
-    let query = generate_query(item_id);
+    let query = generate_query();
     debug!("{request_id}; SQL Prepared for Item Delete operation");
 
     let mut conn = pool.get_conn().map_err(|_| PersistenceError::DBConnError)?;
@@ -19,7 +19,7 @@ pub fn remove_table_item(
     debug!("{request_id}; Starting transaction");
     conn.query_drop("START TRANSACTION").map_err(|_| PersistenceError::TransactionStartError)?;
 
-    match conn.query_drop(query) {
+    match conn.exec_drop(query, (item_id,)) {
         Ok(_) => {
             let affected_rows = conn.affected_rows();
             conn.query_drop("COMMIT").map_err(|_| PersistenceError::CommitError)?;
@@ -59,9 +59,6 @@ fn generate_success_response(item_id: u32) -> RemoveTableItemResponse {
     }
 }
 
-fn generate_query(item_id: u32) -> String {
-    format!(
-        "DELETE FROM table_items WHERE item_id = '{}'",
-        item_id
-    )
+fn generate_query() -> String {
+    "DELETE FROM table_items WHERE item_id = ?".to_string()
 }
