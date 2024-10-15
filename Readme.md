@@ -8,7 +8,8 @@ Project implements three Primary APIs + 1 health check API, which are:
 - Health Check API
 
 ### Requirements Covered:
-- ✅ The client (the restaurant staff “devices” making the requests) MUST be able to: add one or more items with a table number, remove an item for a table, and query the items still remaining for a table.
+- ✅ The client (the restaurant staff “devices” making the requests) MUST be able to: add one or more items with a 
+table number, remove an item for a table, and query the items still remaining for a table.
 ```bash
 curl --location 'localhost:8080/table/add_items' \
 --header 'Content-Type: application/json' \
@@ -28,7 +29,8 @@ curl --location 'localhost:8080/table/add_items' \
     ]
 }'
 ``` 
-- ✅ The application MUST, upon creation request, store the item, the table number, and how long the item will take to cook.
+- ✅ The application MUST, upon creation request, store the item, the table number, and how long the item will take to 
+cook.
 - ✅ The application MUST, upon deletion request, remove a specified item for a specified table number.
 ```bash
 curl --location --request DELETE 'localhost:8080/table/remove_item' \
@@ -64,6 +66,7 @@ curl --location --request GET 'localhost:8080/table/list_items' \
 }'
 ```
 - ✅ The application MUST accept at least 10 simultaneous incoming add/remove/query requests.
+
 ![Alt text](docs/handling_10_concurrent_requests.png)
 
 - ✅ The client MAY limit the number of specific tables in its requests to a finite set (at least 100).
@@ -76,7 +79,8 @@ curl --location --request GET 'localhost:8080/table/list_items' \
  ```bash
 docker-compose up
 ```
-Although, the application boots up in no time, this project gives keeps a small wait after mysql-database is initialized
+Although, the application boots up in no time, this project keeps a small wait *between* mysql-database-initialization 
+and rust-application-startup.
 
 ---
 
