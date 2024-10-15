@@ -76,8 +76,7 @@ curl --location --request GET 'localhost:8080/table/list_items' \
  ```bash
 docker-compose up
 ```
-Although, the application boots up in no time, this project gives a small wait after mysql-database is initialized 
-and rust application boots up.
+Although, the application boots up in no time, this project gives keeps a small wait after mysql-database is initialized
 
 ---
 
