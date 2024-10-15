@@ -12,17 +12,24 @@ mod repository;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
+    // setting up environment
     dotenvy::dotenv().ok();
-    env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
+    // setting up logging
+    env_logger::init_from_env(env_logger::Env::new().default_filter_or(
+        env::var("LOGGING_LEVEL")
+            .expect("Please Check LOGGING_LEVEL env var")
+    ));
 
-    info!("Building mysql connection pool");
-
-    let db_host = env::var("MYSQL_HOST").expect("HOST is not set in .env file");
-    let db_port = env::var("MYSQL_PORT").expect("PORT is not set in .env file");
-    let db_port = db_port.parse().unwrap();
-    let db_name = env::var("MYSQL_DBNAME").expect("DBNAME is not set in .env file");
-    let db_user = env::var("MYSQL_USER").expect("USER is not set in .env file");
-    let db_password = env::var("MYSQL_PASSWORD").expect("PASSWORD is not set in .env file");
+    // setting up database
+    let db_host = env::var("MYSQL_HOST").expect("Please check MYSQL_HOST env var");
+    let db_port = env::var("MYSQL_PORT").expect("Please check MYSQL_PORT env var");
+    let db_port = db_port.parse().expect("Please check PORT env var");
+    let db_name = env::var("MYSQL_DBNAME")
+        .expect("Please check MYSQL_DBNAME env var");
+    let db_user = env::var("MYSQL_USER")
+        .expect("Please check MYSQL_USER env var");
+    let db_password = env::var("MYSQL_PASSWORD")
+        .expect("Please check MYSQL_PASSWORD env var");
 
     let builder = mysql::OptsBuilder::new()
         .ip_or_hostname(Some(db_host))
@@ -33,8 +40,19 @@ async fn main() -> std::io::Result<()> {
 
     let pool = Pool::new(builder).unwrap();
     let shared_data = web::Data::new(pool);
+    info!("Completed building Mysql Connection Pool");
 
-    log::info!("Starting HTTP server at http://localhost:8080");
+    // setting up application
+    let concurrent_workers = env::var("CONCURRENT_WORKERS")
+        .expect("Please check CONCURRENT_WORKERS env var");
+    let concurrent_workers = concurrent_workers.parse()
+        .expect("Please check CONCURRENT_WORKERS env var");
+    let app_host = env::var("APP_HOST").expect("Please check APP_HOST env var");
+    let app_port = env::var("APP_PORT").expect("Please check APP_PORT env var");
+    let app_port:u16 = app_port.parse().expect("Please check APP_PORT env var");
+    let bind_address = format!("{}:{}", app_host, app_port);
+
+    info!("Starting simple-restaurant-api server at http://localhost:8080");
     HttpServer::new(move || {
         App::new()
             .wrap(Logger::default())
@@ -43,8 +61,8 @@ async fn main() -> std::io::Result<()> {
             .service(add_items)
             .service(get_items)
             .service(remove_item)
-    }).bind("0.0.0.0:8080")?
-        .workers(11)
+    }).bind(bind_address)?
+        .workers(concurrent_workers)
         .run()
         .await
 }
