@@ -70,13 +70,13 @@ fn row_to_table_item(row: Result<Row, mysql::Error>) -> Result<TableItem, mysql:
     let row = row?;
     let item_id: u32 = row.get(0)
         .ok_or_else(|| mysql::Error::MySqlError(mysql::MySqlError {
-            state: "error".to_string(),
+            state: "Error: Conversion to u32 failed".to_string(),
             code: 0,
             message: "Missing item_id".into(),
         }))?;
     let table_number: u32 = row.get(1)
         .ok_or_else(|| mysql::Error::MySqlError(mysql::MySqlError {
-            state: "error".to_string(),
+            state: "Error: Conversion to u32 failed".to_string(),
             code: 0,
             message: "Missing table_number".into(),
         }))?;
@@ -84,14 +84,14 @@ fn row_to_table_item(row: Result<Row, mysql::Error>) -> Result<TableItem, mysql:
         Some(Value::Bytes(bytes)) => String::from_utf8_lossy(&*bytes).into_owned(),
         Some(other) => from_value(other),
         None => return Err(mysql::Error::MySqlError(mysql::MySqlError {
-            state: "error".to_string(),
+            state: "Error: Conversion to u32 failed".to_string(),
             code: 0,
             message: "Missing item_name".into(),
         })),
     };
     let prepare_minutes: u32 = row.get(3)
         .ok_or_else(|| mysql::Error::MySqlError(mysql::MySqlError {
-            state: "error".to_string(),
+            state: "Error: Conversion to u32 failed".to_string(),
             code: 0,
             message: "Missing prepare_minutes".into(),
         }))?;
@@ -104,8 +104,8 @@ fn row_to_table_item(row: Result<Row, mysql::Error>) -> Result<TableItem, mysql:
         },
         Some(other) => from_value(other),
         None => return Err(mysql::Error::MySqlError(mysql::MySqlError {
-            state: "error".to_string(),
-            code: 0,
+            state: "Error: Conversion to String failed".to_string(),
+            code: 1,
             message: "Missing ordered_on".into(),
         })),
     };
