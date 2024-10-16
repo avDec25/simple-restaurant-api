@@ -14,6 +14,60 @@ pub fn get_table_items(
     items_ids: Option<Vec<u32>>,
     items_names: Option<Vec<String>>,
 ) -> Result<ListTableItemsResponse, PersistenceError> {
+    let (query, params) = generate_query_and_params(table_number, items_ids, items_names);
+    debug!("{request_id}; SQL Prepared for get table items");
+
+    let mut conn = pool.get_conn().map_err(|_| PersistenceError::DBConnError)?;
+    let result = match conn.exec_iter(query, params) {
+        Ok(result) => {
+            let table_items: Vec<TableItem> = result
+                .map(|row| row_to_table_item(row))
+                .filter_map(Result::ok)
+                .collect();
+
+            if table_items.is_empty() {
+                warn!("{request_id}; No valid table items found");
+                Ok(generate_empty_response())
+            } else {
+                debug!("{request_id}; SQL Executed successfully");
+                Ok(generate_success_response(table_items))
+            }
+        }
+        Err(e) => {
+            error!("{request_id}; SQL Execution failed: {:?}", e);
+            Ok(generate_failed_response())
+        }
+    }; result
+}
+
+
+fn generate_failed_response() -> ListTableItemsResponse {
+    ListTableItemsResponse {
+        status: "failed".to_string(),
+        message: "Could not fetch table items".to_string(),
+        table_items: Vec::new(),
+    }
+}
+
+fn generate_empty_response() -> ListTableItemsResponse {
+    ListTableItemsResponse {
+        status: "success".to_string(),
+        message: "No table items found".to_string(),
+        table_items: Vec::new(),
+    }
+}
+
+fn generate_success_response(table_items: Vec<TableItem>) -> ListTableItemsResponse {
+    ListTableItemsResponse {
+        status: "success".to_string(),
+        message: format!("Found {} table item(s)", table_items.len()),
+        table_items,
+    }
+}
+
+fn generate_query_and_params(table_number: u32, items_ids: Option<Vec<u32>>,
+                             items_names: Option<Vec<String>>
+) -> (String, Vec<Value>) {
     let mut query = String::from("SELECT * FROM table_items WHERE table_number = ?");
     let mut params: Vec<Value> = vec![Value::from(table_number)];
     let mut conditions = Vec::new();
@@ -40,30 +94,7 @@ pub fn get_table_items(
             query.push_str(&conditions.join(" OR "));
         }
     }
-
-    debug!("{request_id}; SQL Prepared for get table items");
-
-    let mut conn = pool.get_conn().map_err(|_| PersistenceError::DBConnError)?;
-    let x = match conn.exec_iter(query, params) {
-        Ok(result) => {
-            let table_items: Vec<TableItem> = result
-                .map(|row| row_to_table_item(row))
-                .filter_map(Result::ok)
-                .collect();
-
-            if table_items.is_empty() {
-                warn!("{request_id}; No valid table items found");
-                Ok(generate_empty_response())
-            } else {
-                debug!("{request_id}; SQL Executed successfully");
-                Ok(generate_success_response(table_items))
-            }
-        }
-        Err(e) => {
-            error!("{request_id}; SQL Execution failed: {:?}", e);
-            Ok(generate_failed_response())
-        }
-    }; x
+    (query, params)
 }
 
 fn row_to_table_item(row: Result<Row, mysql::Error>) -> Result<TableItem, mysql::Error> {
@@ -117,28 +148,4 @@ fn row_to_table_item(row: Result<Row, mysql::Error>) -> Result<TableItem, mysql:
         prepare_minutes,
         ordered_on,
     })
-}
-
-fn generate_failed_response() -> ListTableItemsResponse {
-    ListTableItemsResponse {
-        status: "failed".to_string(),
-        message: "Could not fetch table items".to_string(),
-        table_items: Vec::new(),
-    }
-}
-
-fn generate_empty_response() -> ListTableItemsResponse {
-    ListTableItemsResponse {
-        status: "success".to_string(),
-        message: "No table items found".to_string(),
-        table_items: Vec::new(),
-    }
-}
-
-fn generate_success_response(table_items: Vec<TableItem>) -> ListTableItemsResponse {
-    ListTableItemsResponse {
-        status: "success".to_string(),
-        message: format!("Found {} table item(s)", table_items.len()),
-        table_items,
-    }
 }

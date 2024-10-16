@@ -27,10 +27,7 @@ pub fn remove_table_item(
             if affected_rows > 0 {
                 Ok(generate_success_response(item_id))
             } else {
-                Ok(RemoveTableItemResponse {
-                    status: "success".to_string(),
-                    message: format!("No table item exists with item_id {}", item_id),
-                })
+                Ok(generate_absent_response(item_id))
             }
         }
         Err(e) => {
@@ -42,8 +39,12 @@ pub fn remove_table_item(
     }
 }
 
-
-
+fn generate_absent_response(item_id: u32) -> RemoveTableItemResponse {
+    RemoveTableItemResponse {
+        status: "success".to_string(),
+        message: format!("No table item exists with item_id {}", item_id),
+    }
+}
 
 fn generate_failed_response() -> RemoveTableItemResponse {
     RemoveTableItemResponse {
