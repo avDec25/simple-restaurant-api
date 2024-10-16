@@ -4,7 +4,7 @@ use actix_request_identifier::RequestId;
 use chrono::Local;
 use log::{debug, error};
 use mysql::prelude::*;
-use mysql::Pool;
+use mysql::{Pool};
 use rand::Rng;
 
 pub fn add_items_to_table(
@@ -13,22 +13,31 @@ pub fn add_items_to_table(
     table_number: u32,
     items_names: Vec<String>,
 ) -> Result<AddItemsResponse, PersistenceError> {
-    let records: Vec<String> = generate_table_item_records(table_number, items_names);
-    let query = generate_query(&records);
+    let records: Vec<(String, String, String)> = generate_table_item_records(items_names);
+    let query = generate_query(records.len());
     debug!("{request_id}; SQL Prepared for adding items to table");
 
     let mut conn = pool.get_conn().map_err(|_| PersistenceError::DBConnError)?;
     debug!("{request_id}; Starting transaction");
     conn.query_drop("START TRANSACTION").map_err(|_| PersistenceError::TransactionStartError)?;
 
-    match conn.query_drop(query) {
+    let params = records.iter().flat_map(|(item_name, ordered_on, prepare_minutes)| {
+        vec![
+            table_number.into(),
+            item_name.clone().into(),
+            ordered_on.clone().into(),
+            prepare_minutes.clone().into(),
+        ]
+    }).collect::<Vec<mysql::Value>>();
+
+    match conn.exec_drop(query, params) {
         Ok(_) => {
             let last_id = conn.query_first::<u32, _>("SELECT LAST_INSERT_ID()")
                 .unwrap_or(Some(0)).expect("Error: Unable to acquire the last inserted id");
             let item_ids: Vec<u32> = (last_id..last_id + records.len() as u32).collect();
             conn.query_drop("COMMIT").map_err(|_| PersistenceError::CommitError)?;
             debug!("{request_id}; Transaction Completed");
-            Ok(generate_success_response(table_number, records, item_ids))
+            Ok(generate_success_response(table_number, records.len(), item_ids))
         }
         Err(e) => {
             conn.query_drop("ROLLBACK").map_err(|_| PersistenceError::RollbackError)?;
@@ -39,7 +48,6 @@ pub fn add_items_to_table(
     }
 }
 
-
 fn generate_failed_response(table_number: u32) -> AddItemsResponse {
     AddItemsResponse {
         status: "failed".to_string(),
@@ -48,37 +56,31 @@ fn generate_failed_response(table_number: u32) -> AddItemsResponse {
     }
 }
 
-fn generate_success_response(table_number: u32, values: Vec<String>, item_ids: Vec<u32>) -> AddItemsResponse {
+fn generate_success_response(table_number: u32, num_items: usize, item_ids: Vec<u32>) -> AddItemsResponse {
     AddItemsResponse {
         status: "success".to_string(),
-        message: format!("Added {} item(s) to table number {}", values.len(), table_number),
+        message: format!("Added {} item(s) to table number {}", num_items, table_number),
         items_ids: item_ids,
     }
 }
 
-fn generate_query(records: &Vec<String>) -> String {
+fn generate_query(num_records: usize) -> String {
+    let placeholders: Vec<String> = (0..num_records)
+        .map(|_| "(?, ?, ?, ?)".to_string())
+        .collect();
     format!(
         "INSERT INTO table_items (table_number, item_name, ordered_on, prepare_minutes) VALUES {}",
-        records.join(", ")
+        placeholders.join(", ")
     )
 }
 
-fn generate_table_item_records(table_number: u32, items_names: Vec<String>) -> Vec<String> {
-    let mut values = Vec::new();
-    for item_name in &items_names {
+fn generate_table_item_records(items_names: Vec<String>) -> Vec<(String, String, String)> {
+    items_names.into_iter().filter_map(|item_name| {
         if item_name.replace(' ', "").trim().is_empty() {
-            continue;
+            return None;
         }
         let ordered_on = Local::now().format("%Y-%m-%d %H:%M:%S").to_string();
-        let prepare_minutes = rand::thread_rng().gen_range(5..16);
-
-        values.push(format!(
-            "({}, '{}', '{}', {})",
-            table_number,
-            item_name,
-            ordered_on,
-            prepare_minutes
-        ));
-    }
-    values
+        let prepare_minutes = rand::thread_rng().gen_range(5..16).to_string();
+        Some((item_name, ordered_on, prepare_minutes))
+    }).collect()
 }
