@@ -1,4 +1,4 @@
-use crate::model::error_model::PersistenceError;
+use crate::model::error_model::{generate_mysql_value_error, PersistenceError};
 use crate::model::response_model::ListTableItemsResponse;
 use crate::model::table_model::TableItem;
 use actix_request_identifier::RequestId;
@@ -6,6 +6,7 @@ use log::{debug, error, warn};
 use mysql::prelude::*;
 use mysql::{from_value, Pool, Value, Row};
 use chrono::{NaiveDate, NaiveDateTime, NaiveTime};
+use crate::model::error_model::MysqlValueError::{MissingDatetime, MissingInteger, MissingString};
 
 pub fn get_table_items(
     pool: &Pool,
@@ -21,7 +22,7 @@ pub fn get_table_items(
     let result = match conn.exec_iter(query, params) {
         Ok(result) => {
             let table_items: Vec<TableItem> = result
-                .map(|row| row_to_table_item(row))
+                .map(|row| convert_row_to_table_item(row))
                 .filter_map(Result::ok)
                 .collect();
 
@@ -37,7 +38,8 @@ pub fn get_table_items(
             error!("{request_id}; SQL Execution failed: {:?}", e);
             Ok(generate_failed_response())
         }
-    }; result
+    };
+    result
 }
 
 
@@ -66,7 +68,7 @@ fn generate_success_response(table_items: Vec<TableItem>) -> ListTableItemsRespo
 }
 
 fn generate_query_and_params(table_number: u32, items_ids: Option<Vec<u32>>,
-                             items_names: Option<Vec<String>>
+                             items_names: Option<Vec<String>>,
 ) -> (String, Vec<Value>) {
     let mut query = String::from("SELECT * FROM table_items WHERE table_number = ?");
     let mut params: Vec<Value> = vec![Value::from(table_number)];
@@ -97,48 +99,32 @@ fn generate_query_and_params(table_number: u32, items_ids: Option<Vec<u32>>,
     (query, params)
 }
 
-fn row_to_table_item(row: Result<Row, mysql::Error>) -> Result<TableItem, mysql::Error> {
+fn convert_row_to_table_item(row: Result<Row, mysql::Error>) -> Result<TableItem, mysql::Error> {
     let row = row?;
     let item_id: u32 = row.get(0)
-        .ok_or_else(|| mysql::Error::MySqlError(mysql::MySqlError {
-            state: "Error: Conversion to u32 failed".to_string(),
-            code: 0,
-            message: "Missing item_id".into(),
-        }))?;
+        .ok_or_else(|| generate_mysql_value_error(MissingInteger, "item_id".into()))?;
+
     let table_number: u32 = row.get(1)
-        .ok_or_else(|| mysql::Error::MySqlError(mysql::MySqlError {
-            state: "Error: Conversion to u32 failed".to_string(),
-            code: 0,
-            message: "Missing table_number".into(),
-        }))?;
+        .ok_or_else(|| generate_mysql_value_error(MissingInteger, "table_number".into()))?;
+
     let item_name: String = match row.get(2) {
         Some(Value::Bytes(bytes)) => String::from_utf8_lossy(&*bytes).into_owned(),
         Some(other) => from_value(other),
-        None => return Err(mysql::Error::MySqlError(mysql::MySqlError {
-            state: "Error: Conversion to u32 failed".to_string(),
-            code: 0,
-            message: "Missing item_name".into(),
-        })),
+        None => return Err(generate_mysql_value_error(MissingString, "item_name".into())),
     };
+
     let prepare_minutes: u32 = row.get(3)
-        .ok_or_else(|| mysql::Error::MySqlError(mysql::MySqlError {
-            state: "Error: Conversion to u32 failed".to_string(),
-            code: 0,
-            message: "Missing prepare_minutes".into(),
-        }))?;
+        .ok_or_else(|| generate_mysql_value_error(MissingInteger, "prepare_minutes".into()))?;
+
     let ordered_on: String = match row.get(4) {
         Some(Value::Date(year, month, day, hour, minute, second, _micro_second)) => {
             NaiveDateTime::new(
                 NaiveDate::from_ymd_opt(year as i32, month as u32, day as u32).unwrap(),
-                NaiveTime::from_hms_opt(hour as u32, minute as u32, second as u32).unwrap()
+                NaiveTime::from_hms_opt(hour as u32, minute as u32, second as u32).unwrap(),
             ).format("%Y-%m-%d %H:%M:%S").to_string()
-        },
+        }
         Some(other) => from_value(other),
-        None => return Err(mysql::Error::MySqlError(mysql::MySqlError {
-            state: "Error: Conversion to String failed".to_string(),
-            code: 1,
-            message: "Missing ordered_on".into(),
-        })),
+        None => return Err(generate_mysql_value_error(MissingDatetime, "ordered_on".into())),
     };
 
     Ok(TableItem {
