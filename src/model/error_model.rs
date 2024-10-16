@@ -2,6 +2,7 @@ use actix_web::{HttpResponse, ResponseError};
 use derive_more::{Display, Error, From};
 use log::{error};
 use serde::Serialize;
+use mysql::Error;
 
 #[derive(Debug, Display, Error, From)]
 pub enum PersistenceError {
@@ -48,4 +49,24 @@ impl ResponseError for PersistenceError {
             }
         }
     }
+}
+
+
+#[derive(Debug, Display, Error, From)]
+pub enum MysqlValueError {
+    MissingString,
+    MissingInteger,
+    MissingDatetime
+}
+
+pub fn generate_mysql_value_error(err_type: MysqlValueError, column_name: String) -> Error {
+    Error::MySqlError(mysql::MySqlError {
+        state: "failed".to_string(),
+        code: match err_type {
+            MysqlValueError::MissingString => 1,
+            MysqlValueError::MissingInteger => 2,
+            MysqlValueError::MissingDatetime => 3
+        },
+        message: format!("Error: Issue with value existing in column({column_name})"),
+    })
 }
