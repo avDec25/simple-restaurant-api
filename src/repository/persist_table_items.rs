@@ -24,9 +24,9 @@ pub fn add_items_to_table(
     let params = records.iter().flat_map(|(item_name, ordered_on, prepare_minutes)| {
         vec![
             table_number.into(),
-            item_name.clone().into(),
-            ordered_on.clone().into(),
-            prepare_minutes.clone().into(),
+            item_name.into(),
+            ordered_on.into(),
+            prepare_minutes.into(),
         ]
     }).collect::<Vec<mysql::Value>>();
 

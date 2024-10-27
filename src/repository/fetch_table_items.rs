@@ -84,18 +84,15 @@ fn generate_query_and_params(table_number: u32, items_ids: Option<Vec<u32>>,
     if let Some(ref items_names) = items_names {
         if !items_names.is_empty() {
             conditions.push(format!("item_name IN ({})", vec!["?"; items_names.len()].join(",")));
-            params.extend(items_names.iter().map(|name| Value::from(name.clone())));
+            params.extend(items_names.iter().map(|name| Value::from(name)));
         }
     }
 
     if !conditions.is_empty() {
         query.push_str(" AND ");
-        if conditions.len() == 2 {
-            query.push_str(&format!("( {} )", conditions.join(" OR ")));
-        } else {
-            query.push_str(&conditions.join(" OR "));
-        }
+        query.push_str(&format!("( {} )", conditions.join(" OR ")));
     }
+
     (query, params)
 }
 
