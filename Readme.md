@@ -3,7 +3,7 @@ _https://github.com/paidy/interview/blob/master/SimpleRestaurantApi.md_
 
 Rest Compliant API Hosts two Resources for clients:
 - Table Resource (restaurant table)
-- Item Resource  (ordered item for a table)
+- Item Resource  (ordered items for a table)
 
 For a restaurant, following actions can be performed using the implemented REST APIs:
 - Add Item(s) to a table
@@ -54,46 +54,58 @@ For a restaurant, following actions can be performed using the implemented REST 
     curl --location 'localhost:8080/health_check'
   ```
 
-- ✅ The client (the restaurant staff “devices” making the requests) MUST be able to: add one or more items with a 
-table number, remove an item for a table, and query the items still remaining for a table.
-  ```bash
-  curl --location 'localhost:8080/tables/1' \
-  --header 'Content-Type: application/json' \
-  --data '{
-      "items_names": [
-          "拉麺",
-          "うどん",
-          "そば",
-          "そうめん",
-          "中華そば",
-          "とんかつ",
-          "からあげ",
-          "やきにく",
-          "カレーライス",
-          "オムライス"
-      ]
-  }'
-  ```
-   
-- ✅ The application MUST, upon creation request, store the item, the table number, and how long the item will take to 
-cook.
+- ✅ The client (the restaurant staff “devices” making the requests) MUST be able to: 
+  - add one or more items with a table number,
+    ```bash
+    curl --location 'localhost:8080/tables/1/items' \
+        --header 'Content-Type: application/json' \
+        --data '{
+            "items_names": [
+                "拉麺",
+                "うどん",
+                "そば",
+                "そうめん",
+                "中華そば",
+                "とんかつ",
+                "からあげ",
+                "やきにく",
+                "カレーライス",
+                "オムライス"
+            ]
+        }'
+    ```
+  - remove an item for a table,
+    ```bash
+    curl --location --request DELETE 'localhost:8080/tables/1/items/4'
+    ```
+  - and query the items still remaining for a table.
+    ```bash
+    curl --location 'localhost:8080/tables/1/items'
+    ```    
 
-- ✅ The application MUST, upon deletion request, remove a specified item for a specified table number.
+
+- ✅ The application MUST, upon creation request, 
+  - store the item,
+  - the table number, 
+  - and how long the item will take to cook.
+
+
+- ✅ The application MUST, upon deletion request, 
+  - remove a specified item for a specified table number.
   ```bash
-  curl --location --request DELETE 'localhost:8080/tables/1/items/7' \
-  --header 'Content-Type: application/json'
+  curl --location --request DELETE 'localhost:8080/tables/1/items/4'
   ```
   
-- ✅ The application MUST, upon query request, show all items for a specified table number.
+- ✅ The application MUST, upon query request, 
+  - show all items for a specified table number.
   ```bash
-  curl --location --request GET 'localhost:8080/tables/1' \
-  --header 'Content-Type: application/json'
+  curl --location 'localhost:8080/tables/1/items'
   ```
   
-- ✅ The application MUST, upon query request, show a specified item for a specified table number.
+- ✅ The application MUST, upon query request, 
+  - show a specified item for a specified table number.
   ```bash
-  curl --location --request GET 'localhost:8080/tables/1/items/8' \
-  --header 'Content-Type: application/json'
+  curl --location 'localhost:8080/tables/1/items/2'
   ```
   
 - ✅ The application MUST accept at least 10 simultaneous incoming add/remove/query requests.
