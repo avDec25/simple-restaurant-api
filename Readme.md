@@ -3,7 +3,7 @@ _https://github.com/paidy/interview/blob/master/SimpleRestaurantApi.md_
 
 Rest Compliant API Hosts two Resources for clients:
 - Table Resource (restaurant table)
-- Item Resource  (ordered items for a table)
+- Item Resource  (ordered item for a table)
 
 For a restaurant, following actions can be performed using the implemented REST APIs:
 - Add Item(s) to a table
