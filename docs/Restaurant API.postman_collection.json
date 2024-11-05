@@ -1,11 +1,346 @@
 {
 	"info": {
-		"_postman_id": "819ebe29-831b-4127-81c2-df0a4157fd50",
-		"name": "Restaurant API",
+		"_postman_id": "24db9b7e-7cff-482e-b33a-4da7d653e045",
+		"name": "Fully Rest Restaurant API",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "8587369"
 	},
 	"item": [
+		{
+			"name": "Add Items To Table",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"items_names\": [\n        \"拉麺\",\n        \"うどん\",\n        \"そば\",\n        \"そうめん\",\n        \"中華そば\",\n        \"とんかつ\",\n        \"からあげ\",\n        \"やきにく\",\n        \"カレーライス\",\n        \"オムライス\"\n    ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/tables/1/items",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"tables",
+						"1",
+						"items"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Add Items To Table",
+					"originalRequest": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"items_names\": [\n        \"拉麺\",\n        \"うどん\",\n        \"そば\",\n        \"そうめん\",\n        \"中華そば\",\n        \"とんかつ\",\n        \"からあげ\",\n        \"やきにく\",\n        \"カレーライス\",\n        \"オムライス\"\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "localhost:8080/tables/1/items",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"tables",
+								"1",
+								"items"
+							]
+						}
+					},
+					"status": "Created",
+					"code": 201,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "content-length",
+							"value": "102"
+						},
+						{
+							"key": "x-request-id",
+							"value": "b3155aaf-cff5-478b-8bcf-1462922907d3"
+						},
+						{
+							"key": "content-type",
+							"value": "application/json"
+						},
+						{
+							"key": "date",
+							"value": "Tue, 05 Nov 2024 14:10:58 GMT"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": \"success\",\n    \"message\": \"Added 10 item(s) to table number 1\",\n    \"items_ids\": [\n        1,\n        2,\n        3,\n        4,\n        5,\n        6,\n        7,\n        8,\n        9,\n        10\n    ]\n}"
+				}
+			]
+		},
+		{
+			"name": "Get Table",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/tables/1",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"tables",
+						"1"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Get Table",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/tables/1",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"tables",
+								"1"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "content-length",
+							"value": "3075"
+						},
+						{
+							"key": "content-type",
+							"value": "application/json"
+						},
+						{
+							"key": "x-request-id",
+							"value": "dc5a0709-ccef-479e-81a8-dadf4b19871f"
+						},
+						{
+							"key": "date",
+							"value": "Tue, 05 Nov 2024 14:11:16 GMT"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"table_number\": 1,\n    \"items\": [\n        {\n            \"item_id\": 1,\n            \"table_number\": 1,\n            \"item_name\": \"拉麺\",\n            \"ordered_on\": \"2024-11-05 19:40:58\",\n            \"prepare_minutes\": 9,\n            \"_links\": [\n                {\n                    \"href\": \"/tables/1/items/1\",\n                    \"rel\": \"self\",\n                    \"method\": \"Get\"\n                },\n                {\n                    \"href\": \"/tables/1/items/1\",\n                    \"rel\": \"delete\",\n                    \"method\": \"Delete\"\n                },\n                {\n                    \"href\": \"/tables/1\",\n                    \"rel\": \"table\",\n                    \"method\": \"Get\"\n                }\n            ]\n        },\n        {\n            \"item_id\": 2,\n            \"table_number\": 1,\n            \"item_name\": \"うどん\",\n            \"ordered_on\": \"2024-11-05 19:40:58\",\n            \"prepare_minutes\": 11,\n            \"_links\": [\n                {\n                    \"href\": \"/tables/1/items/2\",\n                    \"rel\": \"self\",\n                    \"method\": \"Get\"\n                },\n                {\n                    \"href\": \"/tables/1/items/2\",\n                    \"rel\": \"delete\",\n                    \"method\": \"Delete\"\n                },\n                {\n                    \"href\": \"/tables/1\",\n                    \"rel\": \"table\",\n                    \"method\": \"Get\"\n                }\n            ]\n        },\n        {\n            \"item_id\": 3,\n            \"table_number\": 1,\n            \"item_name\": \"そば\",\n            \"ordered_on\": \"2024-11-05 19:40:58\",\n            \"prepare_minutes\": 7,\n            \"_links\": [\n                {\n                    \"href\": \"/tables/1/items/3\",\n                    \"rel\": \"self\",\n                    \"method\": \"Get\"\n                },\n                {\n                    \"href\": \"/tables/1/items/3\",\n                    \"rel\": \"delete\",\n                    \"method\": \"Delete\"\n                },\n                {\n                    \"href\": \"/tables/1\",\n                    \"rel\": \"table\",\n                    \"method\": \"Get\"\n                }\n            ]\n        },\n        {\n            \"item_id\": 4,\n            \"table_number\": 1,\n            \"item_name\": \"そうめん\",\n            \"ordered_on\": \"2024-11-05 19:40:58\",\n            \"prepare_minutes\": 12,\n            \"_links\": [\n                {\n                    \"href\": \"/tables/1/items/4\",\n                    \"rel\": \"self\",\n                    \"method\": \"Get\"\n                },\n                {\n                    \"href\": \"/tables/1/items/4\",\n                    \"rel\": \"delete\",\n                    \"method\": \"Delete\"\n                },\n                {\n                    \"href\": \"/tables/1\",\n                    \"rel\": \"table\",\n                    \"method\": \"Get\"\n                }\n            ]\n        },\n        {\n            \"item_id\": 5,\n            \"table_number\": 1,\n            \"item_name\": \"中華そば\",\n            \"ordered_on\": \"2024-11-05 19:40:58\",\n            \"prepare_minutes\": 7,\n            \"_links\": [\n                {\n                    \"href\": \"/tables/1/items/5\",\n                    \"rel\": \"self\",\n                    \"method\": \"Get\"\n                },\n                {\n                    \"href\": \"/tables/1/items/5\",\n                    \"rel\": \"delete\",\n                    \"method\": \"Delete\"\n                },\n                {\n                    \"href\": \"/tables/1\",\n                    \"rel\": \"table\",\n                    \"method\": \"Get\"\n                }\n            ]\n        },\n        {\n            \"item_id\": 6,\n            \"table_number\": 1,\n            \"item_name\": \"とんかつ\",\n            \"ordered_on\": \"2024-11-05 19:40:58\",\n            \"prepare_minutes\": 10,\n            \"_links\": [\n                {\n                    \"href\": \"/tables/1/items/6\",\n                    \"rel\": \"self\",\n                    \"method\": \"Get\"\n                },\n                {\n                    \"href\": \"/tables/1/items/6\",\n                    \"rel\": \"delete\",\n                    \"method\": \"Delete\"\n                },\n                {\n                    \"href\": \"/tables/1\",\n                    \"rel\": \"table\",\n                    \"method\": \"Get\"\n                }\n            ]\n        },\n        {\n            \"item_id\": 7,\n            \"table_number\": 1,\n            \"item_name\": \"からあげ\",\n            \"ordered_on\": \"2024-11-05 19:40:58\",\n            \"prepare_minutes\": 9,\n            \"_links\": [\n                {\n                    \"href\": \"/tables/1/items/7\",\n                    \"rel\": \"self\",\n                    \"method\": \"Get\"\n                },\n                {\n                    \"href\": \"/tables/1/items/7\",\n                    \"rel\": \"delete\",\n                    \"method\": \"Delete\"\n                },\n                {\n                    \"href\": \"/tables/1\",\n                    \"rel\": \"table\",\n                    \"method\": \"Get\"\n                }\n            ]\n        },\n        {\n            \"item_id\": 8,\n            \"table_number\": 1,\n            \"item_name\": \"やきにく\",\n            \"ordered_on\": \"2024-11-05 19:40:58\",\n            \"prepare_minutes\": 12,\n            \"_links\": [\n                {\n                    \"href\": \"/tables/1/items/8\",\n                    \"rel\": \"self\",\n                    \"method\": \"Get\"\n                },\n                {\n                    \"href\": \"/tables/1/items/8\",\n                    \"rel\": \"delete\",\n                    \"method\": \"Delete\"\n                },\n                {\n                    \"href\": \"/tables/1\",\n                    \"rel\": \"table\",\n                    \"method\": \"Get\"\n                }\n            ]\n        },\n        {\n            \"item_id\": 9,\n            \"table_number\": 1,\n            \"item_name\": \"カレーライス\",\n            \"ordered_on\": \"2024-11-05 19:40:58\",\n            \"prepare_minutes\": 13,\n            \"_links\": [\n                {\n                    \"href\": \"/tables/1/items/9\",\n                    \"rel\": \"self\",\n                    \"method\": \"Get\"\n                },\n                {\n                    \"href\": \"/tables/1/items/9\",\n                    \"rel\": \"delete\",\n                    \"method\": \"Delete\"\n                },\n                {\n                    \"href\": \"/tables/1\",\n                    \"rel\": \"table\",\n                    \"method\": \"Get\"\n                }\n            ]\n        },\n        {\n            \"item_id\": 10,\n            \"table_number\": 1,\n            \"item_name\": \"オムライス\",\n            \"ordered_on\": \"2024-11-05 19:40:58\",\n            \"prepare_minutes\": 11,\n            \"_links\": [\n                {\n                    \"href\": \"/tables/1/items/10\",\n                    \"rel\": \"self\",\n                    \"method\": \"Get\"\n                },\n                {\n                    \"href\": \"/tables/1/items/10\",\n                    \"rel\": \"delete\",\n                    \"method\": \"Delete\"\n                },\n                {\n                    \"href\": \"/tables/1\",\n                    \"rel\": \"table\",\n                    \"method\": \"Get\"\n                }\n            ]\n        }\n    ],\n    \"_links\": [\n        {\n            \"href\": \"/tables/1\",\n            \"rel\": \"self\",\n            \"method\": \"Get\"\n        },\n        {\n            \"href\": \"/tables/1\",\n            \"rel\": \"add_items\",\n            \"method\": \"Put\"\n        }\n    ]\n}"
+				}
+			]
+		},
+		{
+			"name": "Get Item of a Table",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/tables/1/items/2",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"tables",
+						"1",
+						"items",
+						"2"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Get Item of a Table",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/tables/1/items/2",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"tables",
+								"1",
+								"items",
+								"2"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "content-length",
+							"value": "290"
+						},
+						{
+							"key": "content-type",
+							"value": "application/json"
+						},
+						{
+							"key": "x-request-id",
+							"value": "68183c60-c0a8-4f84-b67b-29c5d2fe6a46"
+						},
+						{
+							"key": "date",
+							"value": "Tue, 05 Nov 2024 14:11:33 GMT"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"item_id\": 2,\n    \"table_number\": 1,\n    \"item_name\": \"うどん\",\n    \"ordered_on\": \"2024-11-05 19:40:58\",\n    \"prepare_minutes\": 11,\n    \"_links\": [\n        {\n            \"href\": \"/tables/1/items/2\",\n            \"rel\": \"self\",\n            \"method\": \"Get\"\n        },\n        {\n            \"href\": \"/tables/1/items/2\",\n            \"rel\": \"delete\",\n            \"method\": \"Delete\"\n        },\n        {\n            \"href\": \"/tables/1\",\n            \"rel\": \"table\",\n            \"method\": \"Get\"\n        }\n    ]\n}"
+				}
+			]
+		},
+		{
+			"name": "Get All Items of a Table",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/tables/1/items",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"tables",
+						"1",
+						"items"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Get All Items of a Table",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/tables/1/items",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"tables",
+								"1",
+								"items"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "content-length",
+							"value": "2934"
+						},
+						{
+							"key": "content-type",
+							"value": "application/json"
+						},
+						{
+							"key": "x-request-id",
+							"value": "b54b201c-a3a1-42c1-b92d-42c2923a27ee"
+						},
+						{
+							"key": "date",
+							"value": "Tue, 05 Nov 2024 14:12:03 GMT"
+						}
+					],
+					"cookie": [],
+					"body": "[\n    {\n        \"item_id\": 1,\n        \"table_number\": 1,\n        \"item_name\": \"拉麺\",\n        \"ordered_on\": \"2024-11-05 19:40:58\",\n        \"prepare_minutes\": 9,\n        \"_links\": [\n            {\n                \"href\": \"/tables/1/items/1\",\n                \"rel\": \"self\",\n                \"method\": \"Get\"\n            },\n            {\n                \"href\": \"/tables/1/items/1\",\n                \"rel\": \"delete\",\n                \"method\": \"Delete\"\n            },\n            {\n                \"href\": \"/tables/1\",\n                \"rel\": \"table\",\n                \"method\": \"Get\"\n            }\n        ]\n    },\n    {\n        \"item_id\": 2,\n        \"table_number\": 1,\n        \"item_name\": \"うどん\",\n        \"ordered_on\": \"2024-11-05 19:40:58\",\n        \"prepare_minutes\": 11,\n        \"_links\": [\n            {\n                \"href\": \"/tables/1/items/2\",\n                \"rel\": \"self\",\n                \"method\": \"Get\"\n            },\n            {\n                \"href\": \"/tables/1/items/2\",\n                \"rel\": \"delete\",\n                \"method\": \"Delete\"\n            },\n            {\n                \"href\": \"/tables/1\",\n                \"rel\": \"table\",\n                \"method\": \"Get\"\n            }\n        ]\n    },\n    {\n        \"item_id\": 3,\n        \"table_number\": 1,\n        \"item_name\": \"そば\",\n        \"ordered_on\": \"2024-11-05 19:40:58\",\n        \"prepare_minutes\": 7,\n        \"_links\": [\n            {\n                \"href\": \"/tables/1/items/3\",\n                \"rel\": \"self\",\n                \"method\": \"Get\"\n            },\n            {\n                \"href\": \"/tables/1/items/3\",\n                \"rel\": \"delete\",\n                \"method\": \"Delete\"\n            },\n            {\n                \"href\": \"/tables/1\",\n                \"rel\": \"table\",\n                \"method\": \"Get\"\n            }\n        ]\n    },\n    {\n        \"item_id\": 4,\n        \"table_number\": 1,\n        \"item_name\": \"そうめん\",\n        \"ordered_on\": \"2024-11-05 19:40:58\",\n        \"prepare_minutes\": 12,\n        \"_links\": [\n            {\n                \"href\": \"/tables/1/items/4\",\n                \"rel\": \"self\",\n                \"method\": \"Get\"\n            },\n            {\n                \"href\": \"/tables/1/items/4\",\n                \"rel\": \"delete\",\n                \"method\": \"Delete\"\n            },\n            {\n                \"href\": \"/tables/1\",\n                \"rel\": \"table\",\n                \"method\": \"Get\"\n            }\n        ]\n    },\n    {\n        \"item_id\": 5,\n        \"table_number\": 1,\n        \"item_name\": \"中華そば\",\n        \"ordered_on\": \"2024-11-05 19:40:58\",\n        \"prepare_minutes\": 7,\n        \"_links\": [\n            {\n                \"href\": \"/tables/1/items/5\",\n                \"rel\": \"self\",\n                \"method\": \"Get\"\n            },\n            {\n                \"href\": \"/tables/1/items/5\",\n                \"rel\": \"delete\",\n                \"method\": \"Delete\"\n            },\n            {\n                \"href\": \"/tables/1\",\n                \"rel\": \"table\",\n                \"method\": \"Get\"\n            }\n        ]\n    },\n    {\n        \"item_id\": 6,\n        \"table_number\": 1,\n        \"item_name\": \"とんかつ\",\n        \"ordered_on\": \"2024-11-05 19:40:58\",\n        \"prepare_minutes\": 10,\n        \"_links\": [\n            {\n                \"href\": \"/tables/1/items/6\",\n                \"rel\": \"self\",\n                \"method\": \"Get\"\n            },\n            {\n                \"href\": \"/tables/1/items/6\",\n                \"rel\": \"delete\",\n                \"method\": \"Delete\"\n            },\n            {\n                \"href\": \"/tables/1\",\n                \"rel\": \"table\",\n                \"method\": \"Get\"\n            }\n        ]\n    },\n    {\n        \"item_id\": 7,\n        \"table_number\": 1,\n        \"item_name\": \"からあげ\",\n        \"ordered_on\": \"2024-11-05 19:40:58\",\n        \"prepare_minutes\": 9,\n        \"_links\": [\n            {\n                \"href\": \"/tables/1/items/7\",\n                \"rel\": \"self\",\n                \"method\": \"Get\"\n            },\n            {\n                \"href\": \"/tables/1/items/7\",\n                \"rel\": \"delete\",\n                \"method\": \"Delete\"\n            },\n            {\n                \"href\": \"/tables/1\",\n                \"rel\": \"table\",\n                \"method\": \"Get\"\n            }\n        ]\n    },\n    {\n        \"item_id\": 8,\n        \"table_number\": 1,\n        \"item_name\": \"やきにく\",\n        \"ordered_on\": \"2024-11-05 19:40:58\",\n        \"prepare_minutes\": 12,\n        \"_links\": [\n            {\n                \"href\": \"/tables/1/items/8\",\n                \"rel\": \"self\",\n                \"method\": \"Get\"\n            },\n            {\n                \"href\": \"/tables/1/items/8\",\n                \"rel\": \"delete\",\n                \"method\": \"Delete\"\n            },\n            {\n                \"href\": \"/tables/1\",\n                \"rel\": \"table\",\n                \"method\": \"Get\"\n            }\n        ]\n    },\n    {\n        \"item_id\": 9,\n        \"table_number\": 1,\n        \"item_name\": \"カレーライス\",\n        \"ordered_on\": \"2024-11-05 19:40:58\",\n        \"prepare_minutes\": 13,\n        \"_links\": [\n            {\n                \"href\": \"/tables/1/items/9\",\n                \"rel\": \"self\",\n                \"method\": \"Get\"\n            },\n            {\n                \"href\": \"/tables/1/items/9\",\n                \"rel\": \"delete\",\n                \"method\": \"Delete\"\n            },\n            {\n                \"href\": \"/tables/1\",\n                \"rel\": \"table\",\n                \"method\": \"Get\"\n            }\n        ]\n    },\n    {\n        \"item_id\": 10,\n        \"table_number\": 1,\n        \"item_name\": \"オムライス\",\n        \"ordered_on\": \"2024-11-05 19:40:58\",\n        \"prepare_minutes\": 11,\n        \"_links\": [\n            {\n                \"href\": \"/tables/1/items/10\",\n                \"rel\": \"self\",\n                \"method\": \"Get\"\n            },\n            {\n                \"href\": \"/tables/1/items/10\",\n                \"rel\": \"delete\",\n                \"method\": \"Delete\"\n            },\n            {\n                \"href\": \"/tables/1\",\n                \"rel\": \"table\",\n                \"method\": \"Get\"\n            }\n        ]\n    }\n]"
+				}
+			]
+		},
+		{
+			"name": "Delete Item of a Table",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "localhost:8080/tables/1/items/4",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"tables",
+						"1",
+						"items",
+						"4"
+					]
+				}
+			},
+			"response": [
+				{
+					"name": "Delete Item of a Table",
+					"originalRequest": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/tables/1/items/4",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"tables",
+								"1",
+								"items",
+								"4"
+							]
+						}
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "json",
+					"header": [
+						{
+							"key": "content-length",
+							"value": "66"
+						},
+						{
+							"key": "content-type",
+							"value": "application/json"
+						},
+						{
+							"key": "x-request-id",
+							"value": "eb5d6ecf-cca9-407d-a9cd-97e58f849506"
+						},
+						{
+							"key": "date",
+							"value": "Tue, 05 Nov 2024 14:12:25 GMT"
+						}
+					],
+					"cookie": [],
+					"body": "{\n    \"status\": \"success\",\n    \"message\": \"Removed table item with item_id 4\"\n}"
+				}
+			]
+		},
 		{
 			"name": "Health Check",
 			"request": {
@@ -22,94 +357,44 @@
 					]
 				}
 			},
-			"response": []
-		},
-		{
-			"name": "Add Table Items",
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"table_number\": 1,\n    \"items_names\": [\n        \"拉麺\",\n        \"うどん\",\n        \"そば\",\n        \"そうめん\",\n        \"中華そば\",\n        \"とんかつ\",\n        \"からあげ\",\n        \"やきにく\",\n        \"カレーライス\",\n        \"オムライス\"\n    ]\n}",
-					"options": {
-						"raw": {
-							"language": "json"
+			"response": [
+				{
+					"name": "Health Check",
+					"originalRequest": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/health_check",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"health_check"
+							]
 						}
-					}
-				},
-				"url": {
-					"raw": "localhost:8080/table/add_items",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"table",
-						"add_items"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "List Table Items",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"table_number\": 1,\n    \"items_ids\": [8, 9],\n    \"items_names\": [\"うどん\"]\n}",
-					"options": {
-						"raw": {
-							"language": "json"
+					},
+					"status": "OK",
+					"code": 200,
+					"_postman_previewlanguage": "plain",
+					"header": [
+						{
+							"key": "content-length",
+							"value": "33"
+						},
+						{
+							"key": "x-request-id",
+							"value": "e1a9f1eb-a815-4e16-b417-d8b5727b88c9"
+						},
+						{
+							"key": "date",
+							"value": "Tue, 05 Nov 2024 14:12:31 GMT"
 						}
-					}
-				},
-				"url": {
-					"raw": "localhost:8080/table/list_items",
-					"host": [
-						"localhost"
 					],
-					"port": "8080",
-					"path": [
-						"table",
-						"list_items"
-					]
+					"cookie": [],
+					"body": "Health OK at 2024-11-05][19:42:31"
 				}
-			},
-			"response": []
-		},
-		{
-			"name": "Remove Table Item",
-			"request": {
-				"method": "DELETE",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"item_id\": 7\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "localhost:8080/table/remove_item",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"table",
-						"remove_item"
-					]
-				}
-			},
-			"response": []
+			]
 		}
 	]
 }
