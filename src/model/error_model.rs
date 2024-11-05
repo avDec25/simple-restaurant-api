@@ -10,6 +10,8 @@ pub enum PersistenceError {
     TransactionStartError,
     CommitError,
     RollbackError,
+    ResourceNotFound,
+    DBOpError,
 }
 
 #[derive(Debug, Display, Error, Serialize)]
@@ -45,6 +47,20 @@ impl ResponseError for PersistenceError {
                 error!("Failed: Unable to Rollback Transaction");
                 HttpResponse::InternalServerError().json(PersistenceErrorResponse {
                     message: "Failed: Database busy, Please report rollback failure".to_string(),
+                })
+            }
+
+            PersistenceError::ResourceNotFound => {
+                error!("Failed: Resource Not Found");
+                HttpResponse::NotFound().json(PersistenceErrorResponse {
+                    message: "Failed: No valid table items found".to_string(),
+                })
+            }
+
+            PersistenceError::DBOpError => {
+                error!("Failed: Unable to Execute SQL");
+                HttpResponse::InternalServerError().json(PersistenceErrorResponse {
+                    message: "Failed: SQL Execution failure".to_string(),
                 })
             }
         }

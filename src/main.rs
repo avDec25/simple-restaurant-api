@@ -1,5 +1,5 @@
 use crate::api::health_check_api::health_check;
-use crate::api::table_api::{add_items, get_item, get_table, remove_item};
+use crate::api::table_api::{add_items, get_all_items, get_item, get_table, remove_item};
 use actix_web::middleware::Logger;
 use actix_web::{web, App, HttpServer};
 use log::info;
@@ -63,6 +63,7 @@ async fn main() -> std::io::Result<()> {
             .service(add_items)
             .service(get_table)
             .service(get_item)
+            .service(get_all_items)
             .service(remove_item)
     }).bind(bind_address)?
         .workers(concurrent_workers)

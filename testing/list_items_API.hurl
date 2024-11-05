@@ -1,6 +1,5 @@
-POST http://localhost:8080/table/add_items
+POST http://localhost:8080/tables/1/items
 {
-    "table_number": 1,
     "items_names": [
         "拉麺",
         "うどん",
@@ -14,7 +13,7 @@ POST http://localhost:8080/table/add_items
         "オムライス"
     ]
 }
-HTTP 200
+HTTP 201
 [Asserts]
 header "x-request-id" matches "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
 jsonpath "$.status" == "success"
@@ -33,55 +32,24 @@ item_id_9: jsonpath "$.items_ids[8]"
 item_id_10: jsonpath "$.items_ids[9]"
 
 
-GET http://localhost:8080/table/list_items
-{
-    "table_number": 1
-}
+GET http://localhost:8080/tables/1
 HTTP 200
 [Asserts]
 header "x-request-id" matches "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
-jsonpath "$.status" == "success"
-jsonpath "$.table_items" count >= 10
+jsonpath "$.items" count >= 10
+jsonpath "$.table_number" == 1
 
 
-GET http://localhost:8080/table/list_items
-{
-    "table_number": 1,
-    "items_ids": [{{item_id_8}}, {{item_id_9}}]
-}
+GET http://localhost:8080/tables/1/items
 HTTP 200
 [Asserts]
 header "x-request-id" matches "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
-jsonpath "$.status" == "success"
-jsonpath "$.message" == "Found 2 table item(s)"
-jsonpath "$.table_items" count == 2
-jsonpath "$.table_items[0].item_id" == {{item_id_8}}
-jsonpath "$.table_items[1].item_id" == {{item_id_9}}
+jsonpath "$" count >= 10
 
 
-GET http://localhost:8080/table/list_items
-{
-    "table_number": 1,
-    "items_names": ["うどん"]
-}
+GET http://localhost:8080/tables/1/items/{{item_id_1}}
 HTTP 200
 [Asserts]
 header "x-request-id" matches "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
-jsonpath "$.status" == "success"
-jsonpath "$.table_items" count >= 1
-jsonpath "$.table_items[0].item_name" == "うどん"
-
-
-GET http://localhost:8080/table/list_items
-{
-    "table_number": 1,
-    "items_ids": [{{item_id_8}}, {{item_id_9}}],
-    "items_names": ["うどん"]
-}
-HTTP 200
-[Asserts]
-header "x-request-id" matches "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
-jsonpath "$.status" == "success"
-jsonpath "$.table_items" count >= 3
-
-
+jsonpath "$.item_id" == {{item_id_1}}
+jsonpath "$.table_number" == 1
