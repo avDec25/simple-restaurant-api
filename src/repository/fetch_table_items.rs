@@ -1,6 +1,5 @@
 use crate::model::error_model::{generate_mysql_value_error, PersistenceError};
-use crate::model::response_model::ListTableItemsResponse;
-use crate::model::table_model::TableItem;
+use crate::model::resource_model::TableItem;
 use actix_request_identifier::RequestId;
 use log::{debug, error, warn};
 use mysql::prelude::*;
@@ -14,7 +13,7 @@ pub fn get_table_items(
     table_number: u32,
     items_ids: Option<Vec<u32>>,
     items_names: Option<Vec<String>>,
-) -> Result<ListTableItemsResponse, PersistenceError> {
+) -> Result<Vec<TableItem>, PersistenceError> {
     let (query, params) = generate_query_and_params(table_number, items_ids, items_names);
     debug!("{request_id}; SQL Prepared for get table items");
 
@@ -28,44 +27,20 @@ pub fn get_table_items(
 
             if table_items.is_empty() {
                 warn!("{request_id}; No valid table items found");
-                Ok(generate_empty_response())
+                Err(PersistenceError::ResourceNotFound)
             } else {
                 debug!("{request_id}; SQL Executed successfully");
-                Ok(generate_success_response(table_items))
+                Ok(table_items)
             }
         }
         Err(e) => {
             error!("{request_id}; SQL Execution failed: {:?}", e);
-            Ok(generate_failed_response())
+            Err(PersistenceError::DBOpError)
         }
     };
     result
 }
 
-
-fn generate_failed_response() -> ListTableItemsResponse {
-    ListTableItemsResponse {
-        status: "failed".to_string(),
-        message: "Could not fetch table items".to_string(),
-        table_items: Vec::new(),
-    }
-}
-
-fn generate_empty_response() -> ListTableItemsResponse {
-    ListTableItemsResponse {
-        status: "success".to_string(),
-        message: "No table items found".to_string(),
-        table_items: Vec::new(),
-    }
-}
-
-fn generate_success_response(table_items: Vec<TableItem>) -> ListTableItemsResponse {
-    ListTableItemsResponse {
-        status: "success".to_string(),
-        message: format!("Found {} table item(s)", table_items.len()),
-        table_items,
-    }
-}
 
 fn generate_query_and_params(table_number: u32, items_ids: Option<Vec<u32>>,
                              items_names: Option<Vec<String>>,

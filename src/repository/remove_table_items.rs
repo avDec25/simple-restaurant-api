@@ -9,6 +9,7 @@ use mysql::{Pool};
 pub fn remove_table_item(
     pool: &Pool,
     request_id: RequestId,
+    table_number: u32,
     item_id: u32,
 ) -> Result<RemoveTableItemResponse, PersistenceError> {
     let query = generate_query();
@@ -19,7 +20,7 @@ pub fn remove_table_item(
     debug!("{request_id}; Starting transaction");
     conn.query_drop("START TRANSACTION").map_err(|_| PersistenceError::TransactionStartError)?;
 
-    match conn.exec_drop(query, (item_id,)) {
+    match conn.exec_drop(query, (table_number, item_id,)) {
         Ok(_) => {
             let affected_rows = conn.affected_rows();
             conn.query_drop("COMMIT").map_err(|_| PersistenceError::CommitError)?;
@@ -61,5 +62,5 @@ fn generate_success_response(item_id: u32) -> RemoveTableItemResponse {
 }
 
 fn generate_query() -> String {
-    "DELETE FROM table_items WHERE item_id = ?".to_string()
+    "DELETE FROM table_items WHERE table_number = ? and item_id = ?".to_string()
 }

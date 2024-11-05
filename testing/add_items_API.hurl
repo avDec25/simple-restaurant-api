@@ -1,6 +1,5 @@
-POST http://localhost:8080/table/add_items
+POST http://localhost:8080/tables/8/items
 {
-    "table_number": 8,
     "items_names": [
         "拉麺",
         "うどん",
@@ -9,7 +8,7 @@ POST http://localhost:8080/table/add_items
         "中華そば"
     ]
 }
-HTTP 200
+HTTP 201
 [Asserts]
 header "x-request-id" matches "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
 jsonpath "$.status" == "success"

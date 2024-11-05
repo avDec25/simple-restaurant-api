@@ -1,4 +1,4 @@
-// k6 run add_items.js --console-output=console_out.txt
+// k6 run add_items.js
 
 import http from 'k6/http';
 import { dishes } from './menu_items.js';
@@ -29,9 +29,8 @@ export default function () {
     const table_number = Math.floor(Math.random() * TOTAL_TABLES) + 1;
 
     const payload = JSON.stringify({
-        "table_number": table_number,
         "items_names" : generate_random_order(Math.floor(Math.random() * MAX_TABLE_ITEMS) + 1)
     })
 
-    http.post(`http://localhost:8080/table/add_items`, payload, params);
+    http.post(`http://localhost:8080/tables/${table_number}/items`, payload, params);
 }
