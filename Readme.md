@@ -3,7 +3,7 @@ _https://github.com/paidy/interview/blob/master/SimpleRestaurantApi.md_
 
 Rest Compliant API Hosts two Resources for clients:
 - Table Resource (restaurant table)
-- Item Resource  (ordered items for a table)
+- Item Resource  (ordered item for a table)
 
 For a restaurant, following actions can be performed using the implemented REST APIs:
 - Add Item(s) to a table
@@ -13,7 +13,8 @@ For a restaurant, following actions can be performed using the implemented REST 
 ### Requirements Covered:
 - ✅ The server API MUST fully follow REST API principles and present a set of HTTP endpoints to connect to.
   
-  _REST Compliant API responses are present at the end of this DOC_
+  **_REST Compliant API responses are present in the last section of this file_**
+
   1. Add Item(s) to Table `(POST Request, 201 Created)`
   ```bash
     curl --location 'localhost:8080/tables/1/items' \
@@ -96,24 +97,29 @@ For a restaurant, following actions can be performed using the implemented REST 
   curl --location --request DELETE 'localhost:8080/tables/1/items/4'
   ```
   
+
 - ✅ The application MUST, upon query request, 
   - show all items for a specified table number.
   ```bash
   curl --location 'localhost:8080/tables/1/items'
   ```
+
   
 - ✅ The application MUST, upon query request, 
   - show a specified item for a specified table number.
   ```bash
   curl --location 'localhost:8080/tables/1/items/2'
   ```
+
   
 - ✅ The application MUST accept at least 10 simultaneous incoming add/remove/query requests.
  ![Alt text](docs/handling_10_concurrent_requests.png)
 
 - ✅ The client MAY limit the number of specific tables in its requests to a finite set (at least 100).
 
+
 - ✅ The application MAY assign a length of time for the item to prepare as a random time between 5-15 minutes.
+
  
 - ✅ The application MAY keep the length of time for the item to prepare static
 
